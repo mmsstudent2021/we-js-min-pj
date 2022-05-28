@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4">
+            <form id="addList" class="p-5">
+                <h1 class="aa">List Builder</h1>
+                <div class="input-group mb-3">
+                    <input type="text" id="input" class="form-control" required>
+                    <button class="btn btn-primary">Add List</button>
+                </div>
+                <ul class="list-group" id="list">
+
+
+
+                </ul>
+
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+
+    let input = document.getElementById("input");
+    let btn =document.getElementById("addList");
+    let list = document.getElementById("list");
+
+    let works = ["To Read","To Sleep","To Eat"];
+
+    function liCreate(text){
+        let li = document.createElement("li");
+        li.innerHTML = `
+            <span>${text}</span>
+            <div class="">
+                <button class="btn btn-sm btn-outline-info edit-btn">Edit</button>
+                <button class="btn btn-sm btn-outline-danger del-btn">Del</button>
+            </div>
+        `;
+        li.classList.add("list-group-item","d-flex","justify-content-between")
+        list.append(li);
+    }
+
+    works.forEach(work => {
+        liCreate(work)
+    })
+
+    btn.addEventListener("submit",function (e){
+        e.preventDefault()
+        // console.log("hello")
+        // if(input.value){
+            liCreate(input.value)
+            input.value = null
+        // }
+    })
+
+    // document.querySelectorAll(".del-btn").forEach(el=>{
+    //     console.log(el)
+    //     el.addEventListener("click",function (){
+    //         console.log(el);
+    //     })
+    // })
+
+    list.addEventListener('click',function (e){
+        console.dir(e.target);
+        if(e.target.classList.contains("del-btn")){
+            e.target.parentElement.parentElement.remove()
+        }
+
+        if(e.target.classList.contains("edit-btn")){
+            let spanEle = e.target.parentElement.previousElementSibling;
+            let newText = prompt("Text To Change",spanEle.innerText)
+            spanEle.innerText = newText
+        }
+    });
+
+
+
+
+
+</script>
+</body>
+</html>
