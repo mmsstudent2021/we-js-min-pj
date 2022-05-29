@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style>
+
+        @media print {
+            .print-show{
+                display: block !important;
+            }
+
+            .print-hide{
+                display: none !important;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+
+            <h1 class="my-4 print-hide">Invoice Maker</h1>
+            <h1 class="my-4 d-none print-show">Your Invoice</h1>
+
+            <form action="" id="addRow" class="print-hide">
+                <div class="row">
+                    <div class="col">
+                        <select class="form-select form-select-lg" name="item" required>
+                            <option value="">Select Item</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <input type="number" class="form-control form-control-lg" name="qty" placeholder="Qty" required>
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-lg btn-primary w-100">Add</button>
+                    </div>
+                </div>
+            </form>
+
+            <table class="table table-bordered mt-3">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th class="w-50">Item</th>
+                    <th class="text-end">Price</th>
+                    <th class="text-end">Qty</th>
+                    <th class="text-end">Amount</th>
+                </tr>
+                </thead>
+                <tbody id="rows">
+
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="4" class="text-center">Amount total</td>
+                    <td class="text-end"><span id="totalAmount">0</span></td>
+                </tr>
+                </tfoot>
+            </table>
+
+            <button class="btn btn-primary print-hide btn-lg" onclick="print()">Print</button>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    let products;
+    let item = document.querySelector("[name='item']");
+    let qty = document.querySelector("[name='qty']");
+    let addRow = document.querySelector("#addRow");
+    let rows = document.querySelector("#rows");
+    let totalAmount = document.querySelector("#totalAmount");
+
+    function optionCreate(product){
+        let option = document.createElement("option");
+        option.value = product.id
+        option.innerText = product.title
+        return option;
+    }
+
+    function rowCreate(product,quantity) {
+        let tr = document.createElement("tr");
+        tr.innerHTML = `
+
+            <td>
+                <button class="btn btn-sm btn-outline-danger print-hide del-btn">Del</button>
+            </td>
+            <td>${product.title}</td>
+            <td class="text-end">${product.price}</td>
+            <td class="text-end">${quantity}</td>
+            <td class="text-end amount">${product.price * quantity}</td>
+        `;
+        return tr;
+    }
+
+    function calcTotal(){
+        let amountList = [...document.querySelectorAll(".amount")];
+         // amountList = [...amountList];
+         // console.log(amountList)
+        // let total = 0;
+        // amountList.forEach(amount => total += Number(amount.innerText))
+        return amountList.reduce((x,y) => x+Number(y.innerText) ,0);
+    }
+
+    fetch('https://fakestoreapi.com/products')
+        .then(res=>res.json())
+        .then(json=> {
+            // console.log(json)
+            products = json
+            // console.log(products[5])
+
+            products.forEach(product => item.append(optionCreate(product)))
+
+        })
+
+    addRow.addEventListener("submit",function (e){
+        e.preventDefault()
+        let currentProduct = products.find(product => product.id == item.value);
+        console.log(currentProduct,qty.value,currentProduct.price * qty.value)
+        rows.append(rowCreate(currentProduct,qty.value))
+        totalAmount.innerText = calcTotal();
+        addRow.reset()
+    })
+
+    item.addEventListener('change',function (){
+        console.log("selected")
+        qty.focus()
+    })
+
+
+    rows.addEventListener('click',function (e){
+        if(e.target.classList.contains('del-btn')){
+            e.target.parentElement.parentElement.remove()
+            totalAmount.innerText = calcTotal();
+        }
+    })
+</script>
+</body>
+</html>
